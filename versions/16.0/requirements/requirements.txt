@@ -1,0 +1,16 @@
+num2words==0.5.10
+pandas==2.2.2
+paramiko==3.1.0
+astor
+gevent 
+greenlet 
+websockets
+
+# LOPEZ hr_attendance_zktecho
+pyzk
+# LOPEZ izi_data
+sqlparse
+
+# upgrade utils
+git+https://github.com/odoo/upgrade-util@master
+markdown
