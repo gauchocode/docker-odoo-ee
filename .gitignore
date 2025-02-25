@@ -1,1 +1,8 @@
 .DS_Store
+.env
+./addons
+./config
+./datadir
+./log
+./scrips
+./postgresql

@@ -1,0 +1,49 @@
+services:
+  postgres:
+    container_name: ${PG_CONTAINER_NAME}
+    image: ${PG_IMAGE}:${PG_VERSION}
+    environment:
+      - POSTGRES_DB=${PG_DB}                 # The database name
+      - POSTGRES_USER=${PG_USER}             # The PostgreSQL username
+      - POSTGRES_PASSWORD=${PG_PASSWORD}     # The PostgreSQL password
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - ${PG_PORT}:5432
+    volumes:
+      - ${PG_PATH}:/var/lib/postgresql/data
+
+  #odoo_scripts:
+    #container_name: ${ODOO_SCRIPTS_CONTAINER_NAME}
+    #image: alpine:latest
+    #volumes:
+    #  - ${SCRIPT_PATH}:/scripts
+    #command: /bin/sh -c "/scripts/pull_repos.sh && /scripts/active_modules.sh"
+    #depends_on:
+    #  - odoo
+
+  odoo:
+    container_name: ${ODOO_CONTAINER_NAME}
+    #image: ${ODOO_IMAGE}:${ODOO_VERSION}
+    build: versions/16.0/.
+    restart: unless-stopped
+    command: ["odoo", "-i", "base", "-d", "odoo", "--db-filter=odoo"]
+    #links:
+    #  - postgres:db
+    depends_on:
+      - postgres
+    ports:
+      - ${ODOO_PORT}:8069
+    volumes:
+      - ${CONF_PATH}:/opt/etc/odoo
+      - ${DATA_PATH}:/opt/odoo/data
+      - ${LOG_PATH}:/var/log/odoo
+      - ${CUSTOM_ADDONS}:/opt/odoo/custom-addons
+      - ${SCRIPT_PATH}:/scripts
+      #- ${BASE_DIR_PROD}${PROJECT_PATH}/backup_dir:/var/odoo/backups/
+    environment:
+      - HOST=postgres
+      #- USER=odoo
+      #- PASSWORD=odoo
+      - POSTGRES_DB=${PG_DB}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
