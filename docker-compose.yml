@@ -34,6 +34,8 @@ services:
     ports:
       - ${ODOO_PORT}:8069
     volumes:
+      - ./entrypoint.sh:/scripts/entrypoint.sh  # Monta entrypoint.sh en el contenedor
+      - ./modulos.txt:/scripts/modulos.txt      # Monta modulos.txt en el contenedor
       - ${CONF_PATH}:/opt/etc/odoo
       - ${DATA_PATH}:/opt/odoo/data
       - ${LOG_PATH}:/var/log/odoo
