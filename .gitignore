@@ -4,5 +4,7 @@ addons/
 config/
 datadir/
 log/
-scrips/
+scripts/
 postgresql/
+modulos.txt
+

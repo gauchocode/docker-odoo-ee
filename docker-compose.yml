@@ -26,7 +26,8 @@ services:
     #image: ${ODOO_IMAGE}:${ODOO_VERSION}
     build: versions/16.0/.
     restart: unless-stopped
-    command: ["odoo", "-i", "base", "-d", "odoo", "--db-filter=odoo"]
+    entrypoint: ["/scripts/entrypoint.sh"]
+    #command: ["odoo", "-i", "base", "-d", "odoo", "--db-filter=odoo"]
     #links:
     #  - postgres:db
     depends_on:
@@ -39,7 +40,7 @@ services:
       - ${CONF_PATH}:/opt/etc/odoo
       - ${DATA_PATH}:/opt/odoo/data
       - ${LOG_PATH}:/var/log/odoo
-      - ${CUSTOM_ADDONS}:/opt/odoo/custom-addons
+      - ${CUSTOM_ADDONS}:/mnt/extra-addons
       - ${SCRIPT_PATH}:/scripts
       #- ${BASE_DIR_PROD}${PROJECT_PATH}/backup_dir:/var/odoo/backups/
     environment:

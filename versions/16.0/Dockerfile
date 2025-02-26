@@ -109,7 +109,7 @@ LABEL maintainer="Jorge Obiols <jorge.obiols@gmail.com>"
 
 USER root
 
-ENV ETC_DIR=/opt/odoo/etc
+ENV ETC_DIR=/etc/odoo
 ENV DATA_DIR=/opt/odoo/data
 ENV LOG_DIR=/var/log/odoo
 ENV BKP_DIR=/var/odoo/backups
