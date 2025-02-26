@@ -1,1 +1,4 @@
 .DS_Store
+.vscode/
+versions/16.0/.vscode/*
+versions/17.0/.vscode/*

@@ -1,16 +1,17 @@
-FROM debian:bullseye-slim AS base-image
+FROM ubuntu:jammy AS base-image
 LABEL maintainer="Odoo S.A. <info@odoo.com>"
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
 # Generate locale C.UTF-8 for postgres and general locale data
-ENV LANG C.UTF-8
+ENV LANG en_US.UTF-8
 
 # Retrieve the target architecture to install the correct wkhtmltopdf package
 ARG TARGETARCH
 
-# Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
+# Install required dependencies, including node, npm, and python dependencies
 RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
@@ -41,17 +42,17 @@ RUN apt-get update && \
     fi; \
     WKHTMLTOPDF_ARCH=${TARGETARCH} && \
     case ${TARGETARCH} in \
-    "amd64") WKHTMLTOPDF_ARCH=amd64 && WKHTMLTOPDF_SHA=9df8dd7b1e99782f1cfa19aca665969bbd9cc159  ;; \
-    "arm64")  WKHTMLTOPDF_SHA=58c84db46b11ba0e14abb77a32324b1c257f1f22  ;; \
-    "ppc64le" | "ppc64el") WKHTMLTOPDF_ARCH=ppc64el && WKHTMLTOPDF_SHA=7ed8f6dcedf5345a3dd4eeb58dc89704d862f9cd  ;; \
+    "amd64") WKHTMLTOPDF_ARCH=amd64 && WKHTMLTOPDF_SHA=967390a759707337b46d1c02452e2bb6b2dc6d59  ;; \
+    "arm64")  WKHTMLTOPDF_SHA=90f6e69896d51ef77339d3f3a20f8582bdf496cc  ;; \
+    "ppc64le" | "ppc64el") WKHTMLTOPDF_ARCH=ppc64el && WKHTMLTOPDF_SHA=5312d7d34a25b321282929df82e3574319aed25c  ;; \
     esac \
-    && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bullseye_${WKHTMLTOPDF_ARCH}.deb \
+    && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_${WKHTMLTOPDF_ARCH}.deb \
     && echo ${WKHTMLTOPDF_SHA} wkhtmltox.deb | sha1sum -c - \
     && apt-get install -y --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/* wkhtmltox.deb
 
-# install latest postgresql-client
-RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
+# Install latest postgresql-client for backup and restore operations
+RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && repokey='B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8' \
@@ -64,15 +65,13 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main' > /et
     && rm -f /etc/apt/sources.list.d/pgdg.list \
     && rm -rf /var/lib/apt/lists/*
 
-# Install rtlcss (on Debian buster)
+# Install rtlcss for RTL language support
 RUN npm install -g rtlcss
 
-# Install Odoo
-ENV ODOO_VERSION 16.0
-ENV ODOO_RELEASE=latest
-#ARG ODOO_SHA=3b24f0d4cd39879d60bee66331091e202fa2675b
+# Install Odoo from the nightly builds
+ENV ODOO_VERSION 17.0
+ARG ODOO_RELEASE=20240821
 RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
-#    && echo "${ODOO_SHA} odoo.deb" | sha1sum -c - \
     && apt-get update \
     && apt-get -y install --no-install-recommends ./odoo.deb \
     && rm -rf /var/lib/apt/lists/* odoo.deb
@@ -100,6 +99,7 @@ USER odoo
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["odoo"]
+
 
 ###############################################################################
 ############################ Fin de base image ################################
@@ -147,11 +147,7 @@ RUN rm -r /req
 # crear cache para pyafipws lo necesita para actualizar desde padron y darle
 # permisos para que pueda escribir desde pyafipws porque ahi hay una base
 # sqlite que se usa cuando se refrescan actividades, impuestos y conceptos.
-RUN mkdir /usr/local/lib/python3.9/dist-packages/pyafipws/cache
-RUN chmod -R o+w /usr/local/lib/python3.9/dist-packages/pyafipws
-
-# bajar el cifrado del cliente para evitar el error DH_KEY_TOO_SMALL
-# parece que la afip tiene un cifrado debil.
-RUN sed -i  "s/CipherString = DEFAULT@SECLEVEL=2/CipherString = DEFAULT@SECLEVEL=1/" /etc/ssl/openssl.cnf
+RUN mkdir -p /usr/local/lib/python3.9/dist-packages/pyafipws/cache && \
+    chmod -R o+w /usr/local/lib/python3.9/dist-packages/pyafipws
 
 USER odoo
