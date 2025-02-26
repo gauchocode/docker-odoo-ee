@@ -1,169 +1,33 @@
-# odoo-drogueria
+# Estandar para modulos.txt
+# 1. Los comentarios comienzan con # y son ignorados por los scripts.
+# 2. Un módulo por línea.
+# 3. Los módulos locales se listan directamente sin prefijo.
+# 4. Los módulos de GitHub/GitLab se clonaran en la carpeta addons, dentro de una carpeta con el nombre del repo
+# los links los va a detectar si empiezan con "https" , iba a ser "http" pero daba error con el modulo http_routing
+# Módulos base
+sale_management
+contacts
+product
+sale
+sales_team
+uom
+account_ux
+l10n_ar
+l10n_latam_check
+l10n_latam_invoice_document
+account_payment_group
+account
+account_check_printing
+account_debit_note
+account_edi
+account_edi_ubl_cii
+account_payment
+account_payment_invoice_online_payment_patch
+analytic
+base_vat
+spreadsheet_account
+l10n_latam_base
+stock
 
-## Getting started
-
-- Ventas (6)
-```
-ODOO S.A.
-- sale_management (*) => DEPEND ON: sale, digest
-- contacts (*) => DEPEND ON: base, mail
-- product (*) => DEPEND ON: base, mail, uom
-- sale => DEPEND ON: sales_team, account_payment, utm
-- sales_team => DEPEND ON: base, mail
-- uom => DEPEND ON: base
-```
-
-- Contabilidad (16)
-```
-- ADHOC S.A.
--- account_ux (*) => DEPEND ON: account, base_vat, account_debit_note
--- l10n_ar (*) => DEPEND ON: l10n_latam_invoice_document, l10n_latam_base
--- l10n_latam_check (ODOO) => DEPEND ON: account_check_printing, base_vat
--- l10n_latam_invoice_document (ODOO) => DEPEND ON: account, account_debit_note
-
-- ADHOC S.A. / AITIC S.A.
--- account_payment_group => DEPEND ON: account_ux, l10n_latam_account_sequence
-
-- ODOO S.A.
--- account => DEPEND ON: base_setup, product, analytic, portal, digest
--- account_check_printing => DEPEND ON: account
--- account_debit_note => DEPEND ON: account
--- account_edi => DEPEND ON: account
--- account_edi_ubl_cii => DEPEND ON: account_edi
--- account_payment => DEPEND ON: account, payment
--- account_payment_invoice_online_payment_patch => DEPEND ON: account_payment
--- analytic => DEPEND ON: base, mail, uom
--- base_vat => DEPEND ON: account
--- spreadsheet_account => DEPEND ON: spreadsheet, account
-
-- ODOO / ADHOC S.A.
--- l10n_latam_base (ODOO) => DEPEND ON: contacts, base_vat
-```
-
-- Inventario: 
-```
-- ODOO S.A.
--- stock => DEPEND ON: product, barcodes_gs1_nomenclature, digest
--- purchase => DEPEND ON: account
--- purchase_stock => DEPEND ON: stock_account, purchase
--- product_expiry => DEPEND ON: stock
-```
-
-- Sitio web (1)
-```
-- Por LasLabs, Tecnativa, ITerra, Onestein, Odoo Community Association (OCA)
--- web_responsive => DEPEND ON: web, mail
-```
-
-- Marketing (1)
-```
-- ODOO S.A.
--- digest => DEPEND ON: mail, portal, resource
-```
-
-- Productividad (2)
-```
-- ODOO S.A.
--- mail => DEPEND ON: base, base_setup, bus, web_tour
--- mail_bot => DEPEND ON: mail
-```
-
-- Tecnico (45)
-```
-- ODOO S.A.
--- purchase_price_diff => DEPEND ON: //
--- stock_account => DEPEND ON: 
--- account_sequence => DEPEND ON: 
--- auth_signup => DEPEND ON: 
--- auth_totp_portal => DEPEND ON: 
--- barcodes => DEPEND ON: 
--- barcodes_gs1_nomenclature => DEPEND ON: 
--- base => DEPEND ON: 
--- base_import => DEPEND ON: 
--- base_install_request => DEPEND ON: 
--- base_setup => DEPEND ON: 
--- bus => DEPEND ON: 
--- google_gmail => DEPEND ON: 
--- iap => DEPEND ON: 
--- iap_mail => DEPEND ON: 
--- l10n_latam_account_sequence => DEPEND ON: 
--- partner_autocomplete => DEPEND ON: 
--- payment => DEPEND ON: 
--- resource => DEPEND ON: 
--- sale_product_configurator => DEPEND ON: 
--- sale_purchase => DEPEND ON: 
--- sale_purchase_stock => DEPEND ON: 
--- sale_sms => DEPEND ON: 
--- sale_stock => DEPEND ON: 
--- sms => DEPEND ON: 
--- snailmail => DEPEND ON: 
--- snailmail_account => DEPEND ON: 
--- spreadsheet => DEPEND ON: 
--- spreadsheet_dashboard => DEPEND ON: 
--- spreadsheet_dashboard_account => DEPEND ON: 
--- spreadsheet_dashboard_purchase => DEPEND ON: 
--- spreadsheet_dashboard_purchase_stock => DEPEND ON: 
--- spreadsheet_dashboard_sale => DEPEND ON: 
--- spreadsheet_dashboard_stock_account => DEPEND ON: 
--- stock_sms => DEPEND ON: 
--- utm => DEPEND ON: 
--- web => DEPEND ON: 
--- web_editor => DEPEND ON: 
--- web_kanban_gauge => DEPEND ON: 
--- web_tour => DEPEND ON: 
--- web_unsplash => DEPEND ON: 
--- portal => DEPEND ON: 
--- http_routing => DEPEND ON: 
--- phone_validation => DEPEND ON: 
-```
-
-- localizacion (6)
-```
-- ADHOC S.A.
--- l10n_ar_bank => DEPEND ON: base
--- l10n_ar_stock => DEPEND ON: stock_voucher, l10n_ar_ux, stock_picking_invoice_link
--- l10n_ar_ux => DEPEND ON: l10n_ar, l10n_latam_check, account_withholding, account_payment_group
-
-- ADHOC SA, Moldeo Interactive,Odoo Community Association (OCA)
--- l10n_ar_afipws => DEPEND ON: l10n_ar
--- l10n_ar_afipws_fe => DEPEND ON: l10n_ar_afipws, l10n_ar, account_debit_note
--- l10n_ar_reports => DEPEND ON: l10n_ar, report_xlsx
-
-```
-
-### Gitlab
-
-- https://github.com/ingadhoc/account-financial-tools.git (16 y 17)
-```account_ux```
-- https://github.com/OCA/product-attribute.git
-```none```
-- https://github.com/ingadhoc/stock.git (16 y 17)
-```stock_voucher```
-- https://github.com/ingadhoc/odoo-argentina.git (16 y 17)
-```l10n_ar_ux,l10n_ar_bank```
-- https://github.com/ingadhoc/odoo-argentina-ce.git (16 y 17)
-```l10n_ar_afipws,l10n_ar_afipws_fe,l10n_ar_reports```
-- https://github.com/ingadhoc/partner.git
-```none```
-- https://github.com/OCA/partner-contact.git
-```none```
-- https://github.com/OCA/reporting-engine.git (16 y 17)
-```report_xlsx```
-- https://github.com/OCA/stock-logistics-workflow.git (16 y 17)
-```stock_picking_invoice_link```
-- https://github.com/OCA/web.git
-```web_responsive```
-- https://github.com/ingadhoc/account-invoicing.git
-```none```
-- https://github.com/OCA/sale-workflow.git
-```none```
-- https://github.com/ingadhoc/account-payment.git
-```account_payment_group, account_payment_ux```
-- https://github.com/OCA/stock-logistics-availability.git
-```none```
-- https://github.com/ingadhoc/argentina-sale.git
-```l10n_ar_stock```
-- https://github.com/ingadhoc/product.git
-```none```
-- https://github.com/OCA/OpenUpgrade.git
-```none```
+https://github.com/ingadhoc/account-payment.git 
+account_payment_group
