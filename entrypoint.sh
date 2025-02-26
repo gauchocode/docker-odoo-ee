@@ -76,4 +76,16 @@ ALL_MODULES=$(echo -e "$LOCAL_MODULES\n$declared_dependencies" | sort -u | tr '\
 echo "Lista completa de módulos a instalar: $ALL_MODULES"
 
 echo "Ejecutando Odoo para instalar módulos..."
-exec odoo -i "$ALL_MODULES" -d "$POSTGRES_DB" --db-filter="$POSTGRES_DB" --db_host="$HOST" --db_port=5432 --db_user="$POSTGRES_USER" --db_password="$POSTGRES_PASSWORD" --without-demo=True
+#!/bin/bash
+
+# Verifica si el módulo ya está instalado en la base de datos
+MODULE_NAME="anmat_trazabilidad"  # Cambia esto por el nombre real del módulo
+
+IS_INSTALLED=$(psql -h "$HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -t -c "SELECT state FROM ir_module_module WHERE name = '$MODULE_NAME';" | xargs)
+
+if [[ "$IS_INSTALLED" == "installed" ]]; then
+    echo "El módulo $MODULE_NAME ya está instalado. No se realizará ninguna acción."
+else
+    echo "Instalando módulo $MODULE_NAME..."
+    exec odoo -i "$MODULE_NAME" -d "$POSTGRES_DB" --db-filter="$POSTGRES_DB" --db_host="$HOST" --db_port=5432 --db_user="$POSTGRES_USER" --db_password="$POSTGRES_PASSWORD" --without-demo=True
+fi
