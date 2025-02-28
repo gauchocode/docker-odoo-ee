@@ -7,4 +7,6 @@ log/
 scripts/
 postgresql/
 modulos.txt
-
+.vscode/
+versions/16.0/.vscode/*
+versions/17.0/.vscode/*
