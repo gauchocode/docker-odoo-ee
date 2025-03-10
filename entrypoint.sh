@@ -91,7 +91,6 @@ echo "🚀 Módulos realmente no instalados y que se instalarán: $MODULES_TO_IN
 
 if [ -z "$MODULES_TO_INSTALL" ]; then
     echo "Todos los módulos ya están instalados. No se realizará ninguna acción."
-    exec odoo -d odoo -i anmat_traceability --language=es_AR --load-language=es_AR
     exec odoo -d "$POSTGRES_DB" --db-filter="$POSTGRES_DB" --db_host="$HOST" --db_port=5432 --db_user="$POSTGRES_USER" --db_password="$POSTGRES_PASSWORD"
 else
     echo "Módulos a instalar: $MODULES_TO_INSTALL"
