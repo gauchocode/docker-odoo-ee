@@ -33,14 +33,14 @@ CUSTOM_ADDONS_PATHS=$(odoo --config="$ODOO_CONFIG" --print-addon-paths 2>/dev/nu
 echo "📂 Rutas de módulos en Odoo:"
 echo "$CUSTOM_ADDONS_PATHS"
 
-# Extraer nombres de repositorios desde enlaces de GitHub en el archivo de módulos
-GITHUB_REPOS=$(grep -Eo 'https://github.com/[^ ]+' "$MODULES_FILE" | awk -F'/' '{print $NF}')
+# Extraer nombres de repositorios desde enlaces de GitHub y GitLab en el archivo de módulos
+REPOS=$(grep -Eo 'https://(github|gitlab).com/[^ ]+' "$MODULES_FILE" | awk -F'/' '{print $NF}')
 
-echo "🔗 Repositorios encontrados en el archivo de módulos: $GITHUB_REPOS"
+echo "🔗 Repositorios encontrados en el archivo de módulos: $REPOS"
 
 # Verificar si las carpetas de los repositorios existen en /mnt/extra-addons y agregar su path si falta en Odoo
 MISSING_PATHS=()
-for repo in $GITHUB_REPOS; do
+for repo in $REPOS; do
     if [ -d "$ADDONS_DIR/$repo" ]; then
         echo "✅ La carpeta $repo existe en $ADDONS_DIR"
         if ! echo "$CUSTOM_ADDONS_PATHS" | grep -q "$ADDONS_DIR/$repo"; then
