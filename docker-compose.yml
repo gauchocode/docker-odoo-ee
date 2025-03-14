@@ -48,6 +48,7 @@ services:
       #- USER=odoo
       #- PASSWORD=odoo
       - CUSTOM_ADDONS=${CUSTOM_ADDONS}
+      - MAIN_MODULE=${MAIN_MODULE}
       - POSTGRES_DB=${PG_DB}
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_PASSWORD=${PG_PASSWORD}
