@@ -42,6 +42,7 @@ services:
       - ${LOG_PATH}:/var/log/odoo
       - ${CUSTOM_ADDONS}:/mnt/extra-addons
       - ${SCRIPT_PATH}:/scripts
+      - ${FILE_PATH}:/var/lib/odoo
       #- ${BASE_DIR_PROD}${PROJECT_PATH}/backup_dir:/var/odoo/backups/
     environment:
       - HOST=postgres

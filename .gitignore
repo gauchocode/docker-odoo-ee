@@ -6,6 +6,7 @@ datadir/
 log/
 scripts/
 postgresql/
+filestore/
 modulos.txt
 .vscode/
 versions/16.0/.vscode/*
