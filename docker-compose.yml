@@ -23,8 +23,8 @@ services:
 
   odoo:
     container_name: ${ODOO_CONTAINER_NAME}
-    #image: ${ODOO_IMAGE}:${ODOO_VERSION}
-    build: versions/16.0/.
+    image: ${ODOO_IMAGE}:${ODOO_VERSION}
+    #build: versions/13.0/.
     restart: unless-stopped
     entrypoint: ["/scripts/entrypoint.sh"]
     #command: ["odoo", "-i", "base", "-d", "odoo", "--db-filter=odoo"]
