@@ -8,12 +8,12 @@ set -e
 : "${POSTGRES_PASSWORD:?Variable POSTGRES_PASSWORD no definida}"
 : "${MAIN_MODULE:?Variable MAIN_MODULE no definida}"
 
-# Ruta de addons personalizados
+# Rutas
 ADDONS_DIR="/mnt/extra-addons"
-ODOO_CONFIG="/etc/odoo/odoo.conf"
+ORIGINAL_CONFIG="/etc/odoo/odoo.conf"
+MODIFIED_CONFIG="/var/lib/odoo/odoo.conf"
 
 echo "Esperando a que PostgreSQL esté disponible..."
-# Limitar a 30 intentos (30 segundos de espera)
 for i in {1..30}; do
     if pg_isready -h "$HOST" -p 5432; then
         echo "PostgreSQL está listo."
@@ -23,14 +23,13 @@ for i in {1..30}; do
     sleep 1
 done
 
-# Si después de 30 intentos sigue sin estar listo, abortar
 if ! pg_isready -h "$HOST" -p 5432; then
     echo "❌ No se pudo conectar a PostgreSQL. Abortando..."
     exit 1
 fi
 
 # Obtener rutas actuales de addons
-CUSTOM_ADDONS_PATHS=$(odoo --config="$ODOO_CONFIG" --print-addon-paths 2>/dev/null | tr ':' '\n')
+CUSTOM_ADDONS_PATHS=$(odoo --config="$ORIGINAL_CONFIG" --print-addon-paths 2>/dev/null | tr ':' '\n')
 
 echo "📂 Rutas de módulos en Odoo actualmente:"
 echo "$CUSTOM_ADDONS_PATHS"
@@ -40,7 +39,6 @@ EXTRA_PATHS=()
 for dir in "$ADDONS_DIR"/*/; do
     if [ -d "$dir" ]; then
         echo "Encontrado módulo/carpeta: $dir"
-        # Verificar si ya está en addons_path
         if ! echo "$CUSTOM_ADDONS_PATHS" | grep -q "$dir"; then
             echo "➕ Agregando $dir a addons_path."
             EXTRA_PATHS+=("$dir")
@@ -50,31 +48,49 @@ for dir in "$ADDONS_DIR"/*/; do
     fi
 done
 
-# Si hay nuevas rutas, agregarlas al addons_path
+# Generar nuevo archivo de configuración si hay nuevas rutas
 if [ ${#EXTRA_PATHS[@]} -gt 0 ]; then
-    echo "🛠️ Actualizando addons_path en $ODOO_CONFIG..."
-    # Obtener línea actual
-    ADDONS_PATH=$(grep -E '^addons_path\s*=' "$ODOO_CONFIG" | cut -d'=' -f2 | tr -d ' ')
+    echo "🛠️ Generando archivo de configuración modificado en $MODIFIED_CONFIG..."
+
+    # Si el archivo de destino no existe, copiar el original
+    if [ ! -f "$MODIFIED_CONFIG" ]; then
+        cp "$ORIGINAL_CONFIG" "$MODIFIED_CONFIG"
+        echo "📄 Copia base creada desde el archivo original."
+    else
+        echo "📄 Usando archivo de configuración existente en el destino."
+    fi
+
+    # Leer línea actual de addons_path
+    ADDONS_PATH=$(grep -E '^addons_path\s*=' "$MODIFIED_CONFIG" | cut -d'=' -f2 | tr -d ' ')
 
     # Concatenar las nuevas rutas
     NEW_ADDONS_PATH="$ADDONS_PATH,$(IFS=,; echo "${EXTRA_PATHS[*]}")"
 
-    # Reemplazar la línea completa
-    sed -i "s|^addons_path\s*=.*|addons_path = $NEW_ADDONS_PATH|" "$ODOO_CONFIG"
+    # Reemplazar en el archivo copiado o existente
+    sed -i "s|^addons_path\s*=.*|addons_path = $NEW_ADDONS_PATH|" "$MODIFIED_CONFIG"
 
     echo "✅ addons_path actualizado con éxito."
 else
     echo "No se encontraron nuevas rutas para agregar al addons_path."
+
+    # Si no hay cambios, usar el config original solo si no existe el modificado
+    if [ ! -f "$MODIFIED_CONFIG" ]; then
+        cp "$ORIGINAL_CONFIG" "$MODIFIED_CONFIG"
+        echo "📄 Copia base creada desde el archivo original (sin cambios en addons_path)."
+    else
+        echo "📄 Archivo de configuración ya existe. No se realizaron cambios."
+    fi
 fi
 
-# Verificar si el módulo ya está instalado
+
+# Verificar si el módulo principal está instalado
 echo "🔍 Verificando si el módulo $MAIN_MODULE ya está instalado..."
 INSTALLED_MODULES=$(PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -t -c "SELECT name FROM ir_module_module WHERE state = 'installed';" | tr -d ' ' | tr ',' '\n')
 
 if echo "$INSTALLED_MODULES" | grep -Fxq "$MAIN_MODULE"; then
     echo "✅ El módulo $MAIN_MODULE ya está instalado. Iniciando Odoo normalmente..."
-    exec odoo -d "$POSTGRES_DB" --db-filter="$POSTGRES_DB" --db_host="$HOST" --db_port=5432 --db_user="$POSTGRES_USER" --db_password="$POSTGRES_PASSWORD"
+    exec odoo --config="$MODIFIED_CONFIG" -d "$POSTGRES_DB" --db-filter="$POSTGRES_DB" --db_host="$HOST" --db_port=5432 --db_user="$POSTGRES_USER" --db_password="$POSTGRES_PASSWORD"
 else
     echo "🚀 El módulo $MAIN_MODULE no está instalado. Procediendo con la instalación..."
-    exec odoo -i "$MAIN_MODULE" -d "$POSTGRES_DB" --db-filter="$POSTGRES_DB" --db_host="$HOST" --db_port=5432 --db_user="$POSTGRES_USER" --db_password="$POSTGRES_PASSWORD" --without-demo=True
+    exec odoo --config="$MODIFIED_CONFIG" -i "$MAIN_MODULE" -d "$POSTGRES_DB" --db-filter="$POSTGRES_DB" --db_host="$HOST" --db_port=5432 --db_user="$POSTGRES_USER" --db_password="$POSTGRES_PASSWORD" --without-demo=True
 fi
