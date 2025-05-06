@@ -1,35 +1,30 @@
+networks:
+  odoo:
+  
 services:
   postgres:
-    container_name: ${PG_CONTAINER_NAME}
+    #container_name: ${PG_CONTAINER_NAME}
     image: ${PG_IMAGE}:${PG_VERSION}
+    user: root
     environment:
-      - POSTGRES_DB=${PG_DB}                 # The database name
-      - POSTGRES_USER=${PG_USER}             # The PostgreSQL username
-      - POSTGRES_PASSWORD=${PG_PASSWORD}     # The PostgreSQL password
+      - POSTGRES_DB=${PG_DB}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
       - PGDATA=/var/lib/postgresql/data/pgdata
     ports:
       - ${PG_PORT}:5432
     volumes:
       - ${PG_PATH}:/var/lib/postgresql/data
-
-  #odoo_scripts:
-    #container_name: ${ODOO_SCRIPTS_CONTAINER_NAME}
-    #image: alpine:latest
-    #volumes:
-    #  - ${SCRIPT_PATH}:/scripts
-    #command: /bin/sh -c "/scripts/pull_repos.sh && /scripts/active_modules.sh"
-    #depends_on:
-    #  - odoo
+    networks:
+      - odoo
 
   odoo:
-    container_name: ${ODOO_CONTAINER_NAME}
+    #container_name: ${ODOO_CONTAINER_NAME}
     #image: ${ODOO_IMAGE}:${ODOO_VERSION}
     build: versions/16.0/.
     restart: unless-stopped
     entrypoint: ["/scripts/entrypoint.sh"]
-    #command: ["odoo", "-i", "base", "-d", "odoo", "--db-filter=odoo"]
-    #links:
-    #  - postgres:db
+    user: root
     depends_on:
       - postgres
     ports:
@@ -43,13 +38,12 @@ services:
       - ${CUSTOM_ADDONS}:/mnt/extra-addons
       - ${SCRIPT_PATH}:/scripts
       - ${FILE_PATH}:/var/lib/odoo
-      #- ${BASE_DIR_PROD}${PROJECT_PATH}/backup_dir:/var/odoo/backups/
     environment:
       - HOST=postgres
-      #- USER=odoo
-      #- PASSWORD=odoo
       - CUSTOM_ADDONS=${CUSTOM_ADDONS}
       - MAIN_MODULE=${MAIN_MODULE}
       - POSTGRES_DB=${PG_DB}
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_PASSWORD=${PG_PASSWORD}
+    networks:
+      - odoo
