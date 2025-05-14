@@ -5,7 +5,7 @@ services:
   postgres:
     #container_name: ${PG_CONTAINER_NAME}
     image: ${PG_IMAGE}:${PG_VERSION}
-    user: root
+    restart: unless-stopped
     environment:
       - POSTGRES_DB=${PG_DB}
       - POSTGRES_USER=${PG_USER}
@@ -24,7 +24,6 @@ services:
     build: versions/16.0/.
     restart: unless-stopped
     entrypoint: ["/scripts/entrypoint.sh"]
-    user: root
     depends_on:
       - postgres
     ports:
