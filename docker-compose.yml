@@ -1,9 +1,8 @@
 networks:
-  odoo:
+  network:
   
 services:
   postgres:
-    #container_name: ${PG_CONTAINER_NAME}
     image: ${PG_IMAGE}:${PG_VERSION}
     restart: unless-stopped
     environment:
@@ -11,26 +10,24 @@ services:
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_PASSWORD=${PG_PASSWORD}
       - PGDATA=/var/lib/postgresql/data/pgdata
-    ports:
-      - ${PG_PORT}:5432
     volumes:
       - ${PG_PATH}:/var/lib/postgresql/data
     networks:
-      - odoo
+      - network
 
   odoo:
-    #container_name: ${ODOO_CONTAINER_NAME}
-    #image: ${ODOO_IMAGE}:${ODOO_VERSION}
-    build: versions/16.0/.
+    image: ${ODOO_IMAGE}:${ODOO_VERSION}
+    #build: versions/16.0/.
     restart: unless-stopped
     entrypoint: ["/scripts/entrypoint.sh"]
     depends_on:
       - postgres
     ports:
       - ${ODOO_PORT}:8069
+      - ${ODOO_LP_PORT}:8072
     volumes:
-      - ./entrypoint.sh:/scripts/entrypoint.sh  # Monta entrypoint.sh en el contenedor
-      - ./modulos.txt:/scripts/modulos.txt      # Monta modulos.txt en el contenedor
+      - ./entrypoint.sh:/scripts/entrypoint.sh
+      - ./modulos.txt:/scripts/modulos.txt
       - ${CONF_PATH}:/opt/etc/odoo
       - ${DATA_PATH}:/opt/odoo/data
       - ${LOG_PATH}:/var/log/odoo
@@ -45,4 +42,4 @@ services:
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_PASSWORD=${PG_PASSWORD}
     networks:
-      - odoo
+      - network
