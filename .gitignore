@@ -1,4 +1,13 @@
 .DS_Store
+.env
+addons/
+config/
+datadir/
+log/
+scripts/
+postgresql/
+filestore/
+modulos.txt
 .vscode/
 versions/16.0/.vscode/*
 versions/17.0/.vscode/*
