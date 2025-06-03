@@ -26,3 +26,27 @@ docker login
 docker push gauchocode/docker-odoo:17.0
 ```
 7) Verify the Image on Docker Hub: After the push is complete, go to your Docker Hub account, and you should see the `docker-odoo` repository with the `17.0` tag listed.
+
+# � docker-odoo
+
+Scripts utilitarios para gestionar entornos Odoo en Docker.
+
+---
+
+## � Lista de scripts
+
+| Script                  | Descripción                                                        |
+|------------------------|--------------------------------------------------------------------|
+| `git_pull_addons.sh`   | Hace `git pull` en cada carpeta dentro de `CUSTOM_ADDONS`          |
+| `update_odoo_conf.sh`  | Genera o actualiza el `odoo.conf` con todas las rutas de addons    |
+| `init_base.sh`         | Inicializa la base de datos instalando solo el módulo `base`       |
+| `update_module.sh`     | Actualiza un módulo (o todos) dentro del contenedor Odoo activo    |
+| `restart.sh`           | Reinicia el contenedor de Odoo                                     |
+
+---
+
+## ▶️ Orden recomendado de uso
+
+1. **Actualizar código fuente de addons**
+   ```bash
+   ./git_pull_addons.sh
