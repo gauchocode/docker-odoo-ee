@@ -23,6 +23,7 @@ if $VERBOSE; then
               -u "$MODULE" \
               -d "$PG_DB" \
               --stop-after-init \
+              --no-http \
               --db_host="$HOST" \
               --db_port=5432 \
               --db_user="$PG_USER" \
@@ -33,6 +34,7 @@ else
               -u "$MODULE" \
             -d "$PG_DB" \
               --stop-after-init \
+              --no-http \
               --db_host="$HOST" \
               --db_port=5432 \
               --db_user="$PG_USER" \
