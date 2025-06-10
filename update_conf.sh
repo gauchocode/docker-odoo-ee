@@ -3,7 +3,7 @@ set -e
 source .env
 
 # Ruta fija que debe incluirse siempre en addons_path
-FIXED_BASE="/mnt/extra-addons"
+FIXED_BASE="/mnt/extra-addons,/mnt/enterprise-addons"
 
 # Validaciones
 if [ -z "$CUSTOM_ADDONS" ] || [ -z "$FILE_PATH" ]; then
