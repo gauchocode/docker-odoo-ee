@@ -2,8 +2,9 @@
 set -e
 source .env
 
-# Ruta fija que debe incluirse siempre en addons_path
-FIXED_BASE="/mnt/extra-addons,/mnt/enterprise-addons"
+# Rutas fijas que deben incluirse siempre al inicio de addons_path
+FIXED_BASE="/mnt/extra-addons"
+ENTERPRISE_BASE="/mnt/enterprise-addons"
 
 # Validaciones
 if [ -z "$CUSTOM_ADDONS" ] || [ -z "$FILE_PATH" ]; then
@@ -35,7 +36,7 @@ else
 fi
 
 # Construir lista de rutas para addons_path
-ADDONS_PATHS=("$FIXED_BASE")  # Siempre incluir la base
+ADDONS_PATHS=("$FIXED_BASE" "$ENTERPRISE_BASE")  # Siempre incluir estos dos al inicio
 
 for dir in "$CUSTOM_ADDONS"/*/; do
     if [ -d "$dir" ]; then
