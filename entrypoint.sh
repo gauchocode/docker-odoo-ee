@@ -24,10 +24,11 @@ if ! pg_isready -h "$HOST" -p 5432 >/dev/null; then
     exit 1
 fi
 
-# Ejecutar Odoo con el config generado previamente y conexión a PostgreSQL
-echo "� Iniciando Odoo con configuración $CONFIG_PATH..."
-exec odoo --config="$CONFIG_PATH" \
-          --db_host="$HOST" \
-          --db_port=5432 \
-          --db_user="$POSTGRES_USER" \
-          --db_password="$POSTGRES_PASSWORD"
+# Ejecutar Odoo con debugpy y la config generada previamente
+echo "� Iniciando Odoo en modo depuración (debugpy)..."
+exec python3 -m debugpy --listen 0.0.0.0:5678 \
+    -m odoo --config="$CONFIG_PATH" \
+    --db_host="$HOST" \
+    --db_port=5432 \
+    --db_user="$POSTGRES_USER" \
+    --db_password="$POSTGRES_PASSWORD"

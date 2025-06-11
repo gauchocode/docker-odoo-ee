@@ -25,6 +25,7 @@ services:
     ports:
       - ${ODOO_PORT}:8069
       - ${ODOO_LP_PORT}:8072
+      - "5678:5678"  # <-- Puerto del debugger
     volumes:
       - ./entrypoint.sh:/scripts/entrypoint.sh
       - ./modulos.txt:/scripts/modulos.txt
