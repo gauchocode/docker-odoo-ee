@@ -1,0 +1,7 @@
+# PyAFIP dependencies
+https://github.com/reingart/pyafipws/archive/refs/heads/py3k.zip
+pysimplesoap
+
+
+# Additional dependencies that might be needed
+# Add more dependencies here as needed

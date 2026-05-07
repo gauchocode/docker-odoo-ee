@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env
+.vscode/
+postgresql/
+datadir/
+log/
+filestore/
+addons/
+config/
+scripts/
+enterprise/.git
+enterprise/.github
